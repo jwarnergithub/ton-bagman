@@ -1,6 +1,6 @@
 # TON Storage Manager
 
-Web-based TON Storage manager for a Vultr VPS, built with Next.js App Router and TypeScript.
+Web-based TON Storage manager, built with Next.js App Router and TypeScript.
 
 ## Current status
 
