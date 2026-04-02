@@ -177,13 +177,13 @@ Download speed: 0B/s
 Upload speed: 0B/s
 Peers: 1
                                      ADNL id             Address  Download  Upload   Ready
-bN49ecE1QNRyD6yuVrkh33ET7chwbfsI/Lp2pUarIv0=  207.148.30.78:3333      0B/s    0B/s  100.0%
+bN49ecE1QNRyD6yuVrkh33ET7chwbfsI/Lp2pUarIv0=  203.0.113.9:3333      0B/s    0B/s  100.0%
 `;
 
     expect(parseBagPeers("BAG123", output)).toEqual({
       items: [
         {
-          address: "207.148.30.78:3333",
+          address: "203.0.113.9:3333",
           adnl: "bN49ecE1QNRyD6yuVrkh33ET7chwbfsI/Lp2pUarIv0=",
           downloadRate: "0B/s",
           uploadRate: "0B/s",

@@ -2,7 +2,7 @@
 # AGENTS.md
 
 ## Project
-Build a web-based TON Storage manager for a Vultr VPS.
+Build a web-based TON Storage manager for a VPS running TON Storage.
 
 ## Product goals
 - Web UI for bag management
@@ -83,4 +83,19 @@ Build a web-based TON Storage manager for a Vultr VPS.
 - npm run build passes
 - tests for changed server modules pass
 - README and docs stay in sync with behavior
+
+## Repo automation help
+- This repo is intended to be friendly to coding agents and automation helpers.
+- Prefer making complete, working changes instead of stopping at analysis.
+- When changing user-visible behavior, update the README or docs in the same pass.
+- Prefer using existing service layers and helpers instead of adding duplicate logic.
+- Before adding a new flow, look for an existing shared pattern first.
+  Examples:
+  - shared Tonkeeper QR/link handling
+  - shared API response helpers
+  - shared SSH and TON command wrappers
+- If a task affects deployment or operator workflow, keep `docs/DEPLOYMENT.md` in sync.
+- If a task affects agent workflow or repo-operating conventions, keep `AGENTS.md` in sync.
+- Prefer simple, plain-language UI and docs over internal jargon.
+- Assume future agents may not know TON Storage details. Leave the repo easier to understand than you found it.
 <!-- END:nextjs-agent-rules -->

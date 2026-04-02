@@ -173,8 +173,8 @@ The `/providers` discovery page should be expanded to enrich TonAPI storage-prov
 
 The verified mainnet test showed why this distinction matters:
 
-- provider `0:eab486e7a61723c77d74cc7ae7ee8f45c03f93a164dbd69b081f9203a3211a75` showed very recent account activity after the test interaction
-- the most recent activity before that observed test was `2023-04-24 21:26:04 UTC`
+- a tested provider showed recent account activity after the interaction
+- its previously observed activity was much older
 - even with recent activity visible on the account, the provider still did not activate the tested per-bag contract
 
 ## Provider contract modeling rules
