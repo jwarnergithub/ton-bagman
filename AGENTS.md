@@ -1,5 +1,86 @@
 <!-- BEGIN:nextjs-agent-rules -->
-# This is NOT the Next.js you know
+# AGENTS.md
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+## Project
+Build a web-based TON Storage manager for a Vultr VPS.
+
+## Product goals
+- Web UI for bag management
+- Upload local files from browser to server
+- Stage uploaded files on the app server
+- Transfer staged files to remote VPS over SSH/SFTP
+- Run storage-daemon-cli on the remote VPS
+- Show bag list, bag details, peers, and daemon-related stats
+- Export or inspect metadata where supported
+- Support explicitly dangerous actions like remote file deletion only through guarded flows
+
+## Non-goals for v1
+- No wallet integration
+- No TON Connect
+- No multi-user auth system
+- No direct browser-to-VPS SSH
+- No Electron app
+- No mobile app
+- No background queue unless required by a real bottleneck
+
+## Architecture rules
+- Keep UI, API routes, service logic, SSH transport, and CLI parsing separate.
+- Never place SSH logic directly inside React components.
+- Never place business logic directly inside route handlers.
+- Route handlers should validate input, call services, and return typed responses only.
+- All storage-daemon-cli calls must go through a dedicated adapter layer.
+- Never invent storage-daemon-cli commands. If a command is not documented or verified in this repo, mark it unsupported.
+- Treat remote deletion and destructive operations as separate guarded services.
+
+## Repo layout
+- app/: UI routes and API route handlers
+- src/components/: presentational and interactive UI pieces
+- src/server/ssh/: SSH and SFTP transport
+- src/server/ton-storage/: command builders, parsers, service layer, validators
+- src/server/files/: staging and remote file operations
+- src/server/config/: env parsing and runtime config
+- src/server/audit/: audit logging and dangerous action logging
+- docs/: architecture and command mapping
+- tests/: unit and integration tests
+
+## Tech constraints
+- TypeScript only
+- Use App Router
+- Use route handlers for server endpoints
+- Prefer server components unless client components are needed
+- Prefer minimal dependencies
+- Use zod for runtime input validation if needed
+- No ORM or database unless clearly necessary
+
+## Security rules
+- Never expose SSH secrets to the browser
+- Never send private key material to client components
+- Never log private keys, passphrases, or sensitive env values
+- Destructive actions require explicit confirmation and audit logging
+- Prefer allowlisted remote paths over arbitrary shell path input
+
+## TON rules
+- Wrap documented storage-daemon-cli commands first:
+  create, add-by-hash, add-by-meta, list, get, get-peers, get-meta,
+  download-pause, download-resume, priority-name
+- If delete/remove behavior is requested, implement only after verifying the VPS-specific command or filesystem behavior
+
+## Coding standards
+- Small modules
+- Strong typing
+- Pure parsers where possible
+- Clear error types
+- No giant utility files
+- No silent catch blocks
+
+## Testing
+- Add tests for parsers, validators, and service-layer logic
+- Mock SSH/process execution in tests
+- Avoid requiring a live VPS for default test runs
+
+## Done when
+- npm run lint passes
+- npm run build passes
+- tests for changed server modules pass
+- README and docs stay in sync with behavior
 <!-- END:nextjs-agent-rules -->
