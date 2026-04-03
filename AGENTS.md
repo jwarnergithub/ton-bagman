@@ -100,6 +100,9 @@ Build a web-based TON Storage manager for a VPS running TON Storage.
 - If a task affects agent workflow or repo-operating conventions, keep `AGENTS.md` in sync.
 - If you change the bootstrap flow, keep `scripts/bootstrap-vps.sh`, `scripts/uninstall-bootstrap.sh`, and the tracked `deploy/*.tpl` unit templates aligned.
 - Bootstrap changes should preserve or improve dry-run support, manifest output, logging, and post-install verification.
+- For a fresh VPS install request, default to the bootstrap workflow, not the manual `.env.local` workflow.
+- On a fresh VPS, prefer `scripts/bootstrap-vps.sh --mode auto --dry-run` first, then `--mode full` if the plan looks correct.
+- Only ask the user for manual `TON_*` environment values up front when they explicitly want the manual deployment path or when `ui-only` needs existing TON Storage paths that the bootstrap cannot infer safely.
 - Prefer simple, plain-language UI and docs over internal jargon.
 - Assume future agents may not know TON Storage details. Leave the repo easier to understand than you found it.
 <!-- END:nextjs-agent-rules -->

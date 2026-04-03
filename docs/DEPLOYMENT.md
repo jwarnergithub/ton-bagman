@@ -80,6 +80,8 @@ If you want one command that handles both cases, use:
 sudo ./scripts/bootstrap-vps.sh
 ```
 
+For a fresh VPS, this should usually be the default path an agent uses before asking for manual `TON_*` values.
+
 For a bootstrap-focused operator guide, see:
 
 - [`docs/BOOTSTRAP.md`](./BOOTSTRAP.md)

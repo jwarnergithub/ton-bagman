@@ -68,6 +68,8 @@ sudo ./scripts/bootstrap-vps.sh --mode auto --dry-run --tonapi-api-key your-tona
 
 That shows the intended path without changing the host.
 
+For agent-driven installs on a fresh VPS, this should usually be the default first step instead of asking for a full manual `.env.local` configuration.
+
 ## Common examples
 
 Fresh host:
