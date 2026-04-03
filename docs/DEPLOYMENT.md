@@ -93,6 +93,7 @@ Important notes:
 - it has only been tested on Ubuntu so far
 - it is intentionally opinionated about paths, systemd, localhost SSH, and a same-host deployment
 - in `full` mode it now prefers official TON release binaries and only falls back to a source build when needed
+- the generated `ton-storage.service` starts `storage-daemon` with `--storage-provider` so provider actions work after a fresh bootstrap install
 - it writes tracked `systemd` units from `deploy/`
 - it writes a bootstrap manifest to `/opt/ton-storage/ton-bagman-bootstrap.json`
 - it writes an install log to a timestamped file under `/tmp/`

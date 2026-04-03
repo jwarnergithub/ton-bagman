@@ -46,6 +46,8 @@ It installs:
 - `ton-storage.service`
 - `ton-bagman.service`
 
+The generated `ton-storage.service` enables provider mode with `--storage-provider` so the `My Provider` flow works on fresh bootstrap installs.
+
 This mode refuses to continue if it detects an existing TON Storage install.
 
 ### `ui-only`
