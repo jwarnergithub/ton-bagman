@@ -15,9 +15,9 @@ TON Bagman does not install TON Storage for you.
 
 It expects an existing TON Storage setup with:
 
-- a working daemon control port, usually `127.0.0.1:5555`
+- a working control port for `storage-daemon`, usually `127.0.0.1:5555`
 - working CLI keys for `storage-daemon-cli`
-- remote folders for uploads and bag sources
+- remote folders for uploads and bag source files
 
 At minimum, the app needs to be able to:
 
@@ -35,6 +35,20 @@ These are the folders the app works well with:
 - `/opt/ton-storage/test-output`
 
 If they do not exist yet, create them on the VPS.
+
+## Strongly recommended: run your own liteserver
+
+It is highly recommended to run your own liteserver for TON Storage work.
+
+Client and provider contracts have several failure points that can be difficult to detect when you rely only on public liteservers. A personal liteserver usually makes it easier to:
+
+- read provider settings reliably
+- create storage contract requests
+- see when a provider has activated a contract
+- notice contract state changes
+- keep client and provider communication working consistently
+
+The app can still run without your own liteserver, but storage-contract problems are often harder to understand when public liteserver access is unstable.
 
 ## Make sure the app can use the daemon CLI keys
 
@@ -74,6 +88,8 @@ cp .env.example .env.local
 ```
 
 Then set the values for your setup.
+
+Important: you need to add your own `TONAPI_API_KEY` for the parts of the app that use TonAPI. That can be a free/public TonAPI key or your own paid/personal key.
 
 ### Example `.env.local`
 
@@ -137,7 +153,7 @@ For a simple first deployment:
 npm run start
 ```
 
-That starts the production Next.js server.
+That starts the production web server for the app.
 
 If you want the app to stay up after logout or reboot, run it under something like:
 
@@ -159,20 +175,20 @@ After the app is running, test these in order:
 
 If those work, the app is connected correctly.
 
-## If you do not have a provider yet
+## If you have not created your TON Storage provider yet
 
 That is fine.
 
-The app does not require a provider to be set up before deployment.
+The app does not require you to create a TON Storage provider before deploying the app.
 
 You can deploy the app first and use:
 
 - bag management
 - bag creation
 - provider browsing
-- contract preparation
+- creating storage contract payment links and QR codes
 
-Then later use `My Provider` to set up your own provider.
+Then later use `My Provider` to create and manage your TON Storage provider on that VPS.
 
 ## Common problems
 

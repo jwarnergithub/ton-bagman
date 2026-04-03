@@ -143,15 +143,15 @@ This makes a no-database design plausible for a future provider-contract feature
 
 ## My Provider page
 
-The repo now also includes a provider-operations page for the local daemon at `/my-provider`.
+The repo now also includes a TON Storage provider page for the local daemon at `/my-provider`.
 
 - Setup state:
-  - import a provider private key from a remote file path with `import-pk <file>`
-  - deploy a provider contract with `deploy-provider`
-  - initialize the daemon against an existing provider contract with `init-provider <smc-addr>`
+  - import a TON Storage provider private key from a remote file path with `import-pk <file>` when moving or recovering an existing TON Storage provider
+  - deploy a new TON Storage provider contract with `deploy-provider`
+  - initialize the daemon against an existing TON Storage provider contract with `init-provider <smc-addr>`
 - Managed state:
-  - read current provider params through `get-provider-params --json`
-  - read provider info through `get-provider-info --balances --contracts --json`
+  - read current TON Storage provider params through `get-provider-params --json`
+  - read TON Storage provider info through `get-provider-info --balances --contracts --json`
   - update offer terms with `set-provider-params`
   - update local capacity limits with `set-provider-config`
   - close accepted contracts with `close-contract <address>`

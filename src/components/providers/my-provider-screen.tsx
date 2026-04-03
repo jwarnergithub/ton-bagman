@@ -107,6 +107,7 @@ function ProviderContractCard({
   onClose: (contractAddress: string, confirmation: string) => Promise<void>;
   isClosing: boolean;
 }) {
+  const confirmationPhrase = "CLOSE PROVIDER CONTRACT";
   const [confirmation, setConfirmation] = useState("");
 
   return (
@@ -146,12 +147,23 @@ function ProviderContractCard({
           setConfirmation("");
         }}
       >
+        <p className="text-sm text-[var(--color-ink-muted)]">
+          To cancel this accepted contract, type{" "}
+          <span className="font-medium text-[var(--color-ink)]">
+            {confirmationPhrase}
+          </span>{" "}
+          exactly as shown below, then press{" "}
+          <span className="font-medium text-[var(--color-ink)]">
+            Close Accepted Contract
+          </span>
+          .
+        </p>
         <label className="block space-y-2 text-sm">
           <span className="font-medium">Confirmation</span>
           <input
             value={confirmation}
             onChange={(event) => setConfirmation(event.target.value)}
-            placeholder="CLOSE PROVIDER CONTRACT"
+            placeholder={confirmationPhrase}
             className="block w-full rounded-2xl border border-[var(--color-border)] bg-[var(--color-input)] px-3 py-3 text-sm"
           />
         </label>
