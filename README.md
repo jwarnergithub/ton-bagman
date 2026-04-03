@@ -2,6 +2,10 @@
 
 TON Bagman is a web app for managing TON Storage through a browser.
 
+This project is experimental and should be used at your own risk.
+
+The bootstrap and deployment flow in this repo has only been tested on Ubuntu so far.
+
 It is meant for people who already have a VPS running `storage-daemon` and `storage-daemon-cli` and want an easier way to work with bags, storage contracts, and provider settings without doing everything by hand in the terminal.
 
 ## What it helps you do
@@ -111,6 +115,11 @@ Those are not always the same thing at the same time.
 If you want to set this up on a server, see:
 
 - [`docs/DEPLOYMENT.md`](./docs/DEPLOYMENT.md)
+- [`docs/BOOTSTRAP.md`](./docs/BOOTSTRAP.md)
+
+Use `docs/DEPLOYMENT.md` for the broader deployment guide, including manual setup and app expectations.
+
+Use `docs/BOOTSTRAP.md` for the narrower automated install and rollback flow built around the repo scripts.
 
 That guide assumes:
 
@@ -118,6 +127,25 @@ That guide assumes:
 - TON Storage is already installed and running there
 - you want to connect this app to that VPS over SSH
 - you may or may not have created your TON Storage provider yet
+
+The automated bootstrap path is experimental, should be used at your own risk, and has only been tested on Ubuntu.
+
+It supports three install modes:
+
+- `auto`
+  Detect an existing TON Storage install and install only the UI if one is found
+- `full`
+  Install pinned TON Storage `v2026.03` plus the UI on the same host
+- `ui-only`
+  Install only the UI and point it at an existing TON Storage setup
+
+The bootstrap also includes:
+
+- `--dry-run` to preview changes before touching the host
+- tracked `systemd` templates under `deploy/`
+- a bootstrap manifest and install log for auditability
+- post-install health checks for SSH, the app, and the connection-test route
+- a rollback helper at `scripts/uninstall-bootstrap.sh`
 
 ## Liteserver recommendation
 

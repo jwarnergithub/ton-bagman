@@ -1,8 +1,16 @@
 # Deployment
 
-This guide explains how to deploy TON Bagman onto a system where TON Storage is already installed and running.
+This guide explains how to deploy TON Bagman either onto a fresh host or onto a system where TON Storage is already installed and running.
 
-It assumes:
+This is the broad deployment guide.
+
+If you only want the script-driven install and rollback workflow, use [`docs/BOOTSTRAP.md`](./BOOTSTRAP.md).
+
+Everything in this repo is still experimental and should be used at your own risk.
+
+The automated bootstrap flow in this repo has only been tested on Ubuntu.
+
+The manual path below assumes:
 
 - `storage-daemon` is already running
 - `storage-daemon-cli` already works
@@ -63,6 +71,78 @@ If the default daemon key files are root-only, create app-readable copies in a s
 - `/opt/ton-storage/app-cli-keys/server.pub`
 
 Then point the app at those copied paths in `.env.local`.
+
+## Automated bootstrap
+
+If you want one command that handles both cases, use:
+
+```bash
+sudo ./scripts/bootstrap-vps.sh
+```
+
+For a bootstrap-focused operator guide, see:
+
+- [`docs/BOOTSTRAP.md`](./BOOTSTRAP.md)
+
+Important notes:
+
+- this bootstrap flow is experimental and should be used at your own risk
+- it pins TON to `v2026.03`
+- it has only been tested on Ubuntu so far
+- it is intentionally opinionated about paths, systemd, localhost SSH, and a same-host deployment
+- it writes tracked `systemd` units from `deploy/`
+- it writes a bootstrap manifest to `/opt/ton-storage/ton-bagman-bootstrap.json`
+- it writes an install log to a timestamped file under `/tmp/`
+- it runs post-install health checks unless you use `--dry-run`
+
+Modes:
+
+- `--mode auto`
+  Detects an existing TON Storage install. If found, it installs only the UI. Otherwise it installs both TON Storage and the UI.
+- `--mode full`
+  Installs the pinned TON backend and the UI together on the same host. This mode refuses to continue if it detects an existing TON Storage install.
+- `--mode ui-only`
+  Installs only the web UI and points it at an existing TON Storage install.
+
+Examples:
+
+```bash
+# Preview the detected mode and planned changes without modifying the host
+sudo ./scripts/bootstrap-vps.sh --mode auto --dry-run --tonapi-api-key your-tonapi-key
+
+# Fresh host: install TON Storage v2026.03 plus the UI
+sudo ./scripts/bootstrap-vps.sh --mode full --tonapi-api-key your-tonapi-key
+
+# Existing TON Storage host: install only the UI
+sudo ./scripts/bootstrap-vps.sh --mode ui-only \
+  --daemon-cli-key-path /opt/ton-storage/db/cli-keys/client \
+  --daemon-server-pub /opt/ton-storage/db/cli-keys/server.pub \
+  --remote-base-dir /opt/ton-storage/uploads \
+  --remote-bag-source-dir /opt/ton-storage/bag-sources \
+  --tonapi-api-key your-tonapi-key
+
+# Let the script detect which path to use
+sudo ./scripts/bootstrap-vps.sh --mode auto --tonapi-api-key your-tonapi-key
+```
+
+Rollback:
+
+```bash
+sudo ./scripts/uninstall-bootstrap.sh --manifest /opt/ton-storage/ton-bagman-bootstrap.json
+```
+
+Optional destructive cleanup:
+
+```bash
+sudo ./scripts/uninstall-bootstrap.sh \
+  --manifest /opt/ton-storage/ton-bagman-bootstrap.json \
+  --purge-app-env \
+  --purge-ton-data
+```
+
+## Manual deployment
+
+Use the manual steps below if you do not want the opinionated bootstrap flow.
 
 ## Step 1: get the code onto the machine
 

@@ -34,6 +34,7 @@ Build a web-based TON Storage manager for a VPS running TON Storage.
 
 ## Repo layout
 - app/: UI routes and API route handlers
+- deploy/: tracked deployment templates such as systemd unit templates
 - src/components/: presentational and interactive UI pieces
 - src/server/ssh/: SSH and SFTP transport
 - src/server/ton-storage/: command builders, parsers, service layer, validators
@@ -41,6 +42,7 @@ Build a web-based TON Storage manager for a VPS running TON Storage.
 - src/server/config/: env parsing and runtime config
 - src/server/audit/: audit logging and dangerous action logging
 - docs/: architecture and command mapping
+- scripts/: operator bootstrap, install, and rollback helpers
 - tests/: unit and integration tests
 
 ## Tech constraints
@@ -96,6 +98,8 @@ Build a web-based TON Storage manager for a VPS running TON Storage.
   - shared SSH and TON command wrappers
 - If a task affects deployment or operator workflow, keep `docs/DEPLOYMENT.md` in sync.
 - If a task affects agent workflow or repo-operating conventions, keep `AGENTS.md` in sync.
+- If you change the bootstrap flow, keep `scripts/bootstrap-vps.sh`, `scripts/uninstall-bootstrap.sh`, and the tracked `deploy/*.tpl` unit templates aligned.
+- Bootstrap changes should preserve or improve dry-run support, manifest output, logging, and post-install verification.
 - Prefer simple, plain-language UI and docs over internal jargon.
 - Assume future agents may not know TON Storage details. Leave the repo easier to understand than you found it.
 <!-- END:nextjs-agent-rules -->
