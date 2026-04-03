@@ -276,7 +276,7 @@ render_template() {
 ensure_packages() {
   log "Installing system packages"
   run_cmd "apt-get update"
-  run_cmd "apt-get install -y build-essential ca-certificates cmake curl git libmicrohttpd-dev libsodium-dev libsecp256k1-dev ninja-build openssh-client openssh-server zlib1g-dev"
+  run_cmd "apt-get install -y autoconf automake build-essential ca-certificates cmake curl git libmicrohttpd-dev libsodium-dev libsecp256k1-dev libtool ninja-build openssh-client openssh-server pkg-config zlib1g-dev"
 }
 
 ensure_node() {
