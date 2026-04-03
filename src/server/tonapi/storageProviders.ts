@@ -1,5 +1,7 @@
 import "server-only";
+import { estimateUsdPerMbDay } from "@/src/components/providers/rate-display";
 import { tonApiFetch } from "@/src/server/tonapi/client";
+import { getTonUsdPrice } from "@/src/server/tonapi/rates";
 import type {
   TonApiAccountSummary,
   StorageProvidersResult,
@@ -65,15 +67,20 @@ function formatLastActivity(lastActivityUnix: number | null) {
 function mapProvider(
   provider: TonApiStorageProvidersResponse["providers"][number],
   account: TonApiAccountSummary | null,
+  tonPriceUsd: number | null,
 ): StorageProviderSummary {
   const lastActivity = formatLastActivity(account?.last_activity ?? null);
+  const ratePerMbDayTonValue = provider.rate_per_mb_day / 1_000_000_000;
+  const usdEstimate = estimateUsdPerMbDay(ratePerMbDayTonValue, tonPriceUsd);
 
   return {
     address: provider.address,
     acceptNewContracts: provider.accept_new_contracts,
     ratePerMbDayNanoTon: provider.rate_per_mb_day,
-    ratePerMbDayTonValue: provider.rate_per_mb_day / 1_000_000_000,
+    ratePerMbDayTonValue,
     ratePerMbDayTon: formatTonFromNanoTon(provider.rate_per_mb_day),
+    ratePerMbDayUsdValue: usdEstimate.ratePerMbDayUsdValue,
+    ratePerMbDayUsd: usdEstimate.ratePerMbDayUsd,
     maxSpan: provider.max_span,
     maxSpanLabel: formatSpanAsDaysHoursMinutes(provider.max_span),
     minimalFileSize: provider.minimal_file_size,
@@ -87,7 +94,10 @@ function mapProvider(
 }
 
 export async function listStorageProviders(): Promise<StorageProvidersResult> {
-  const response = await tonApiFetch<TonApiStorageProvidersResponse>("/v2/storage/providers");
+  const [response, tonPriceUsd] = await Promise.all([
+    tonApiFetch<TonApiStorageProvidersResponse>("/v2/storage/providers"),
+    getTonUsdPrice(),
+  ]);
   const accounts = await Promise.all(
     response.providers.map(async (provider) => {
       try {
@@ -99,7 +109,9 @@ export async function listStorageProviders(): Promise<StorageProvidersResult> {
   );
 
   return {
-    providers: response.providers.map((provider, index) => mapProvider(provider, accounts[index])),
+    providers: response.providers.map((provider, index) =>
+      mapProvider(provider, accounts[index], tonPriceUsd),
+    ),
     fetchedAt: new Date().toISOString(),
   };
 }

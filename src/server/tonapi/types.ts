@@ -18,12 +18,23 @@ export type TonApiAccountSummary = {
   balance?: number | string;
 };
 
+export type TonApiRatesResponse = {
+  rates: Record<
+    string,
+    {
+      prices?: Record<string, number>;
+    }
+  >;
+};
+
 export type StorageProviderSummary = {
   address: string;
   acceptNewContracts: boolean;
   ratePerMbDayNanoTon: number;
   ratePerMbDayTonValue: number;
   ratePerMbDayTon: string;
+  ratePerMbDayUsdValue: number | null;
+  ratePerMbDayUsd: string | null;
   maxSpan: number;
   maxSpanLabel: string;
   minimalFileSize: number;

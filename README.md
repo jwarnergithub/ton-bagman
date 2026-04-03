@@ -62,7 +62,7 @@ The providers page shows public providers returned by TonAPI, including:
 
 - provider contract address
 - whether the provider accepts new contracts
-- price in TON per MB per day
+- price in TON per MB per day, plus an informational USD estimate based on current TON market data
 - time between storage proofs
 - minimum and maximum file size
 - last activity
@@ -79,7 +79,7 @@ It can:
 - import a TON Storage provider key when moving or recovering a TON Storage provider that was already created elsewhere
 - show whether the daemon is connected to the TON Storage provider on this VPS
 - show provider balance and last activity
-- update provider pricing and limits
+- update provider pricing and limits, including an informational USD estimate for the current TON rate
 - turn accepting new contracts on or off
 - show accepted contracts
 - close accepted contracts

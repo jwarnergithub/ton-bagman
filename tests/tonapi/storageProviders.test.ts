@@ -35,6 +35,15 @@ describe("listStorageProviders", () => {
         ],
       })
       .mockResolvedValueOnce({
+        rates: {
+          TON: {
+            prices: {
+              USD: 5,
+            },
+          },
+        },
+      })
+      .mockResolvedValueOnce({
         address: "0:provider-1",
         last_activity: lastActivityUnix,
         status: "active",
@@ -43,6 +52,7 @@ describe("listStorageProviders", () => {
     const result = await listStorageProviders();
 
     expect(tonApiFetch).toHaveBeenCalledWith("/v2/storage/providers");
+    expect(tonApiFetch).toHaveBeenCalledWith("/v2/rates?tokens=ton&currencies=usd");
     expect(tonApiFetch).toHaveBeenCalledWith("/v2/accounts/0:provider-1");
     expect(result.providers).toEqual([
       {
@@ -51,6 +61,8 @@ describe("listStorageProviders", () => {
         ratePerMbDayNanoTon: 2000,
         ratePerMbDayTonValue: 0.000002,
         ratePerMbDayTon: "0.000002",
+        ratePerMbDayUsdValue: 0.00001,
+        ratePerMbDayUsd: "$0.00001 USD / MB / day",
         maxSpan: 3000,
         maxSpanLabel: "0d:0h:50m",
         minimalFileSize: 1,

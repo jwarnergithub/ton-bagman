@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { USD_RATE_DISCLAIMER } from "@/src/components/providers/rate-display";
 import { DataPill } from "@/src/components/shared/data-pill";
 import type { StorageProviderSummary } from "@/src/server/tonapi/types";
 
@@ -33,7 +34,13 @@ export function ProviderCard({ provider, footer = null }: ProviderCardProps) {
           </p>
           <p className="mt-2 text-sm font-medium text-[var(--color-ink)]">
             {provider.ratePerMbDayTon} TON / MB / day
+            {provider.ratePerMbDayUsd ? ` (${provider.ratePerMbDayUsd})` : ""}
           </p>
+          {provider.ratePerMbDayUsd ? (
+            <p className="mt-2 text-xs leading-5 text-[var(--color-ink-muted)]">
+              {USD_RATE_DISCLAIMER}
+            </p>
+          ) : null}
         </div>
         <div className="rounded-2xl border border-[var(--color-border)] bg-[var(--color-surface-panel)] px-4 py-3">
           <p className="text-xs uppercase tracking-[0.16em] text-[var(--color-ink-muted)]">

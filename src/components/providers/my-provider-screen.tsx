@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  estimateUsdPerMbDay,
+  USD_RATE_DISCLAIMER,
+} from "@/src/components/providers/rate-display";
 import { ActionNotice } from "@/src/components/shared/action-notice";
 import { EmptyState } from "@/src/components/shared/empty-state";
 import { PageShell } from "@/src/components/shared/page-shell";
@@ -25,6 +29,7 @@ import type {
 type MyProviderScreenProps = {
   initialOverview: MyProviderOverview | null;
   initialError: string | null;
+  initialTonPriceUsd: number | null;
 };
 
 type RequestState<T> = {
@@ -182,6 +187,7 @@ function ProviderContractCard({
 export function MyProviderScreen({
   initialOverview,
   initialError,
+  initialTonPriceUsd,
 }: MyProviderScreenProps) {
   const [overview, setOverview] = useState<MyProviderOverview | null>(initialOverview);
   const [errorMessage, setErrorMessage] = useState(initialError);
@@ -371,6 +377,22 @@ export function MyProviderScreen({
       },
     ];
   }, [overview]);
+
+  const ratePerMbDayUsd = useMemo(() => {
+    const trimmed = ratePerMbDayTon.trim();
+
+    if (trimmed === "") {
+      return null;
+    }
+
+    const tonValue = Number(trimmed);
+
+    if (!Number.isFinite(tonValue) || tonValue < 0) {
+      return null;
+    }
+
+    return estimateUsdPerMbDay(tonValue, initialTonPriceUsd).ratePerMbDayUsd;
+  }, [initialTonPriceUsd, ratePerMbDayTon]);
 
   const pendingDeployment = overview?.pendingDeployment ?? null;
 
@@ -711,7 +733,10 @@ export function MyProviderScreen({
                 </div>
               </label>
               <label className="space-y-2 text-sm">
-                <span className="font-medium">Rate per MB/day (TON)</span>
+                <span className="font-medium">
+                  Rate per MB/day (TON)
+                  {ratePerMbDayUsd ? ` (${ratePerMbDayUsd})` : ""}
+                </span>
                 <input
                   value={ratePerMbDayTon}
                   onChange={(event) => setRatePerMbDayTon(event.target.value)}
@@ -722,6 +747,11 @@ export function MyProviderScreen({
                   Enter the client price in TON per MB per day. The daemon stores this internally
                   in nanoTON with up to 9 decimal places.
                 </p>
+                {ratePerMbDayUsd ? (
+                  <p className="text-xs leading-5 text-[var(--color-ink-muted)]">
+                    {USD_RATE_DISCLAIMER}
+                  </p>
+                ) : null}
               </label>
               <label className="space-y-2 text-sm">
                 <span className="font-medium">Time between storage proofs</span>
