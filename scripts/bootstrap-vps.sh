@@ -527,7 +527,7 @@ setup_local_ssh_key() {
   chmod 0644 "$SSH_KNOWN_HOSTS_PATH"
 
   local keyscan_output=""
-  keyscan_output="$(ssh-keyscan -p "$TON_SSH_PORT" -H "$TON_SSH_HOST" 2>/dev/null || true)"
+  keyscan_output="$(ssh-keyscan -p "$TON_SSH_PORT" "$TON_SSH_HOST" 2>/dev/null || true)"
   if [[ -n "$keyscan_output" ]]; then
     while IFS= read -r line; do
       [[ -z "$line" ]] && continue
