@@ -348,6 +348,7 @@ detect_existing_storage() {
   EXISTING_STORAGE_DETECTED=0
   EXISTING_STORAGE_REASONS=()
   EXISTING_STORAGE_SERVICE=""
+  local has_runtime_keys=0
 
   if command -v storage-daemon >/dev/null 2>&1; then
     add_existing_storage_reason "found storage-daemon at $(command -v storage-daemon)"
@@ -365,8 +366,12 @@ detect_existing_storage() {
     add_existing_storage_reason "found existing storage-daemon.service"
   fi
 
-  if [[ -d "$TON_DB_DIR" ]]; then
-    add_existing_storage_reason "found existing TON data dir at $TON_DB_DIR"
+  if [[ -f "$TON_DB_DIR/cli-keys/client" || -f "$TON_DB_DIR/cli-keys/server.pub" ]]; then
+    has_runtime_keys=1
+  fi
+
+  if [[ "$has_runtime_keys" -eq 1 ]]; then
+    add_existing_storage_reason "found existing TON runtime keys under $TON_DB_DIR"
   fi
 }
 
