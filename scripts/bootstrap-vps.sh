@@ -276,7 +276,7 @@ render_template() {
 ensure_packages() {
   log "Installing system packages"
   run_cmd "apt-get update"
-  run_cmd "apt-get install -y autoconf automake build-essential ca-certificates cmake curl git libmicrohttpd-dev libsodium-dev libsecp256k1-dev libtool ninja-build openssh-client openssh-server pkg-config zlib1g-dev"
+  run_cmd "apt-get install -y autoconf automake build-essential ca-certificates cmake curl git libmicrohttpd-dev libsodium-dev libsecp256k1-dev libtool ninja-build openssh-client openssh-server pkg-config unzip zlib1g-dev"
 }
 
 ensure_node() {
@@ -405,6 +405,63 @@ prepare_directories() {
   run_cmd "install -d -m 0755 -o '$APP_USER' -g '$APP_USER' '$TON_ROOT' '$TON_BIN_DIR' '$TON_DB_DIR' '$TON_UPLOADS_DIR_FULL' '$TON_BAG_SOURCES_DIR_FULL' '$TON_TEST_OUTPUT_DIR' '$(dirname "$TON_SOURCE_DIR")'"
 }
 
+detect_release_binary_arch() {
+  local machine_arch
+  machine_arch="$(uname -m)"
+
+  case "$machine_arch" in
+    x86_64|amd64)
+      printf '%s\n' "x86_64"
+      ;;
+    aarch64|arm64)
+      printf '%s\n' "arm64"
+      ;;
+    *)
+      return 1
+      ;;
+  esac
+}
+
+install_ton_storage_from_release_binaries() {
+  local release_arch
+  if ! release_arch="$(detect_release_binary_arch)"; then
+    log "No official TON binary bundle mapping is configured for $(uname -m); falling back to source build"
+    return 1
+  fi
+
+  local asset_name="ton-linux-${release_arch}.zip"
+  local asset_url="https://github.com/ton-blockchain/ton/releases/download/${TON_VERSION}/${asset_name}"
+  local temp_zip="/tmp/${asset_name}"
+
+  log "Installing storage-daemon and storage-daemon-cli from official release binary ${asset_name}"
+
+  if [[ "$DRY_RUN" == "1" ]]; then
+    log "[dry-run] would download $asset_url and extract storage-daemon binaries"
+    return 0
+  fi
+
+  if ! curl -fsSL "$asset_url" -o "$temp_zip"; then
+    log "Official TON binary download failed for ${asset_name}; falling back to source build"
+    rm -f "$temp_zip"
+    return 1
+  fi
+
+  if ! unzip -j -o "$temp_zip" storage-daemon storage-daemon-cli -d "$TON_BIN_DIR"; then
+    log "Official TON binary extraction failed for ${asset_name}; falling back to source build"
+    rm -f "$temp_zip"
+    return 1
+  fi
+
+  rm -f "$temp_zip"
+
+  run_cmd "chmod 0755 '$TON_BIN_DIR/storage-daemon' '$TON_BIN_DIR/storage-daemon-cli'"
+  run_cmd "chown root:root '$TON_BIN_DIR/storage-daemon' '$TON_BIN_DIR/storage-daemon-cli'"
+  run_cmd "ln -sf '$TON_BIN_DIR/storage-daemon' /usr/local/bin/storage-daemon"
+  run_cmd "ln -sf '$TON_BIN_DIR/storage-daemon-cli' /usr/local/bin/storage-daemon-cli"
+
+  return 0
+}
+
 checkout_ton_source() {
   log "Fetching official TON source at $TON_VERSION"
   if [[ ! -d "$TON_SOURCE_DIR/.git" ]]; then
@@ -423,6 +480,16 @@ build_ton_storage() {
   run_cmd "install -m 0755 -o root -g root '$TON_SOURCE_DIR/build/storage/storage-daemon/storage-daemon-cli' '$TON_BIN_DIR/storage-daemon-cli'"
   run_cmd "ln -sf '$TON_BIN_DIR/storage-daemon' /usr/local/bin/storage-daemon"
   run_cmd "ln -sf '$TON_BIN_DIR/storage-daemon-cli' /usr/local/bin/storage-daemon-cli"
+}
+
+install_ton_storage_binaries() {
+  if install_ton_storage_from_release_binaries; then
+    return
+  fi
+
+  ensure_llvm
+  checkout_ton_source
+  build_ton_storage
 }
 
 download_global_config() {
@@ -801,11 +868,9 @@ resolve_bootstrap_mode
 setup_local_ssh_key
 
 if [[ "$FULL_MODE_ACTIVE" -eq 1 ]]; then
-  ensure_llvm
   detect_adnl_ip
   prepare_directories
-  checkout_ton_source
-  build_ton_storage
+  install_ton_storage_binaries
   download_global_config
   write_storage_service
   start_storage_service_if_needed

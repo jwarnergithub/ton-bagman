@@ -18,7 +18,8 @@ The bootstrap is meant to help with same-host deployments where TON Bagman and T
 Depending on mode, it can:
 
 - install the TON Bagman UI
-- install pinned TON Storage from official TON source at `v2026.03`
+- install pinned TON Storage from official TON release binaries at `v2026.03`
+- fall back to an official source build if no supported release binary fits the host
 - generate `.env.local`
 - create localhost SSH access for the app user
 - write `systemd` units from tracked templates in `deploy/`

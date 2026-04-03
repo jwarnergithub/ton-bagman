@@ -92,6 +92,7 @@ Important notes:
 - it pins TON to `v2026.03`
 - it has only been tested on Ubuntu so far
 - it is intentionally opinionated about paths, systemd, localhost SSH, and a same-host deployment
+- in `full` mode it now prefers official TON release binaries and only falls back to a source build when needed
 - it writes tracked `systemd` units from `deploy/`
 - it writes a bootstrap manifest to `/opt/ton-storage/ton-bagman-bootstrap.json`
 - it writes an install log to a timestamped file under `/tmp/`

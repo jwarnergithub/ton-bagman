@@ -142,6 +142,7 @@ It supports three install modes:
 The bootstrap also includes:
 
 - `--dry-run` to preview changes before touching the host
+- binary-first TON installation with source-build fallback
 - tracked `systemd` templates under `deploy/`
 - a bootstrap manifest and install log for auditability
 - post-install health checks for SSH, the app, and the connection-test route
