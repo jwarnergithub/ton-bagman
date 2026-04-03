@@ -191,8 +191,10 @@ SSH auth modes:
 
 - `TON_SSH_AUTH_MODE=agent`
   Requires `SSH_AUTH_SOCK`
+  Best for local development where the app inherits your shell's SSH agent
 - `TON_SSH_AUTH_MODE=key_path`
   Requires `TON_SSH_PRIVATE_KEY_PATH`
+  Recommended for production deployments and background services
 - `TON_SSH_AUTH_MODE=inline_key`
   Requires `TON_SSH_PRIVATE_KEY`
 
@@ -200,6 +202,11 @@ Host verification:
 
 - set `TON_SSH_HOST_FINGERPRINT`, `TON_SSH_KNOWN_HOSTS_PATH`, or both
 - in production, host verification is required
+
+Production note:
+
+- if the app is started by `systemd`, `pm2`, Docker, or another background service, do not assume your interactive SSH agent is available to the app process
+- if uploads or connection tests fail with `All configured authentication methods failed`, switch from `TON_SSH_AUTH_MODE=agent` to `TON_SSH_AUTH_MODE=key_path` and point `TON_SSH_PRIVATE_KEY_PATH` at a readable deploy key on the app host
 
 TON Storage settings that can be changed:
 

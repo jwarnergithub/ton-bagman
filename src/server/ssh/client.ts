@@ -92,6 +92,8 @@ type Ssh2SftpConnection = {
   end(): void;
 };
 
+const SSH_AUTH_FAILURE_PATTERN = /all configured authentication methods failed/i;
+
 function getHostVerificationMode(config: RuntimeConfig) {
   if (config.sshHostFingerprint && config.sshKnownHostsPath) {
     return "fingerprint+known_hosts" as const;
@@ -223,11 +225,15 @@ async function createSsh2Runner(
     connectionConfig.privateKey = await resolvePrivateKey(config, readPrivateKeyFile);
   }
 
-  await new Promise<void>((resolve, reject) => {
-    client.once("ready", () => resolve());
-    client.once("error", (error) => reject(error));
-    client.connect(connectionConfig);
-  });
+  try {
+    await new Promise<void>((resolve, reject) => {
+      client.once("ready", () => resolve());
+      client.once("error", (error) => reject(error));
+      client.connect(connectionConfig);
+    });
+  } catch (error) {
+    throw describeSshConnectionError(error, config);
+  }
 
   return {
     async exec(commandLine: string): Promise<RawRemoteExecResult> {
@@ -299,6 +305,23 @@ async function createSsh2Runner(
       client.end();
     },
   };
+}
+
+function describeSshConnectionError(error: unknown, config: RuntimeConfig) {
+  if (!(error instanceof Error)) {
+    return new Error("SSH connection failed.");
+  }
+
+  if (
+    config.sshAuthMode === "agent" &&
+    SSH_AUTH_FAILURE_PATTERN.test(error.message)
+  ) {
+    return new Error(
+      "SSH authentication failed. TON_SSH_AUTH_MODE=agent requires the app process to have a working SSH_AUTH_SOCK. On a deployed server, prefer TON_SSH_AUTH_MODE=key_path with TON_SSH_PRIVATE_KEY_PATH unless your app service is explicitly started with access to your SSH agent socket.",
+    );
+  }
+
+  return error;
 }
 
 async function loadSsh2ConnectionFactory(): Promise<() => Ssh2Connection> {

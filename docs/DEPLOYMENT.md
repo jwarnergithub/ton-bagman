@@ -91,6 +91,10 @@ Then set the values for your setup.
 
 Important: you need to add your own `TONAPI_API_KEY` for the parts of the app that use TonAPI. That can be a free/public TonAPI key or your own paid/personal key.
 
+For production deployments, prefer `TON_SSH_AUTH_MODE=key_path`.
+
+`TON_SSH_AUTH_MODE=agent` is convenient while developing from an interactive shell, but it often fails once the app is started by `systemd`, `pm2`, Docker, or another background service because the Node process may not inherit a working `SSH_AUTH_SOCK`.
+
 ### Example `.env.local`
 
 This example assumes:
@@ -201,6 +205,12 @@ Check:
 - `TON_SSH_USER`
 - SSH key path or agent setup
 - host verification settings
+
+If the app reports `All configured authentication methods failed` and you are using `TON_SSH_AUTH_MODE=agent`, the most common fix is to switch to:
+
+- `TON_SSH_AUTH_MODE=key_path`
+- `TON_SSH_PRIVATE_KEY_PATH=/absolute/path/to/a-readable-private-key`
+- `TON_SSH_KNOWN_HOSTS_PATH=/absolute/path/to/known_hosts`
 
 ### The app connects, but daemon commands fail
 

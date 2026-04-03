@@ -111,4 +111,35 @@ describe("testSshConnection", () => {
       durationMs: 18,
     });
   });
+
+  it("surfaces a deployment-friendly message for agent auth failures", async () => {
+    const config: RuntimeConfig = {
+      ...runtimeConfig,
+      sshAuthMode: "agent",
+      sshAgentSocket: "/tmp/ssh-agent.sock",
+      sshPrivateKey: null,
+    };
+    const handlers = new Map<string, (...args: unknown[]) => void>();
+    const createConnection = vi.fn(() => ({
+      once(event: "ready" | "error", listener: (...args: unknown[]) => void) {
+        handlers.set(event, listener);
+        return this;
+      },
+      connect() {
+        const errorHandler = handlers.get("error");
+        errorHandler?.(new Error("All configured authentication methods failed"));
+      },
+      exec: vi.fn(),
+      sftp: vi.fn(),
+      end: vi.fn(),
+    }));
+
+    await expect(
+      createSshClient(config, {
+        createConnection,
+      }),
+    ).rejects.toThrow(
+      /TON_SSH_AUTH_MODE=agent requires the app process to have a working SSH_AUTH_SOCK/,
+    );
+  });
 });
