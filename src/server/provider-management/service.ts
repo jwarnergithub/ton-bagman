@@ -439,6 +439,16 @@ export async function deployMyProvider(): Promise<MyProviderMutationResponse> {
   return buildMutationResponse(result);
 }
 
+export async function clearPendingProviderDeployment(): Promise<MyProviderMutationResponse> {
+  await removePendingProviderDeploymentRecord();
+
+  return buildMutationResponse({
+    action: "clear-pending-deployment",
+    status: "completed",
+    rawOutput: "Cleared the pending provider deployment record.",
+  });
+}
+
 export async function initMyProvider(
   request: InitMyProviderRequest,
 ): Promise<MyProviderMutationResponse> {

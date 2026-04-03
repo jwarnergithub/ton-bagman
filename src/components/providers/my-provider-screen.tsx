@@ -582,6 +582,16 @@ export function MyProviderScreen({
               <p className="mt-2 break-all">{pendingDeployment.providerAddressFriendly}</p>
               <p className="mt-1 break-all text-xs">{pendingDeployment.providerAddressRaw}</p>
             </div>
+            <ActionNotice
+              tone="error"
+              title="Do not redeploy blindly after funding"
+              description="If you already sent 1 TON to this non-bounceable provider address, do not assume it is safe to deploy again. Clear the stuck pending state only after you have recorded this provider address and fixed the underlying daemon or liteserver issue."
+              details={[
+                "Clearing pending deployment only removes the app's saved pending record.",
+                "It does not cancel an on-chain provider contract or refund the earlier funding transaction.",
+                "After recovery, prefer reconnecting the daemon to this same provider address before considering a new deployment.",
+              ]}
+            />
             <a
               href={pendingDeployment.tonkeeperLink}
               target="_blank"
@@ -599,6 +609,21 @@ export function MyProviderScreen({
               {busyAction === "refresh-overview"
                 ? "Refreshing Provider Status..."
                 : "Refresh Provider Status"}
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                void runMutation(
+                  "clear-pending-deployment",
+                  "/api/my-provider/pending-deployment/clear",
+                )
+              }
+              disabled={busyAction === "clear-pending-deployment"}
+              className="inline-flex rounded-full border border-rose-300 px-4 py-2 text-sm font-medium text-rose-700 disabled:opacity-60"
+            >
+              {busyAction === "clear-pending-deployment"
+                ? "Clearing Pending State..."
+                : "Clear Pending Deployment"}
             </button>
           </div>
         </Panel>

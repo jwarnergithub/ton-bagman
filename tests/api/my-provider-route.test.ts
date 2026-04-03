@@ -5,6 +5,7 @@ vi.mock("../../src/server/provider-management/service", () => ({
   getMyProviderOverview: vi.fn(),
   importMyProviderPrivateKey: vi.fn(),
   deployMyProvider: vi.fn(),
+  clearPendingProviderDeployment: vi.fn(),
   initMyProvider: vi.fn(),
   updateMyProviderParams: vi.fn(),
   updateMyProviderConfig: vi.fn(),
@@ -14,12 +15,14 @@ vi.mock("../../src/server/provider-management/service", () => ({
 import { GET as getMyProviderRoute } from "../../app/api/my-provider/route";
 import { POST as importKeyRoute } from "../../app/api/my-provider/import-key/route";
 import { POST as deployRoute } from "../../app/api/my-provider/deploy/route";
+import { POST as clearPendingDeploymentRoute } from "../../app/api/my-provider/pending-deployment/clear/route";
 import { POST as initRoute } from "../../app/api/my-provider/init/route";
 import { POST as paramsRoute } from "../../app/api/my-provider/params/route";
 import { POST as configRoute } from "../../app/api/my-provider/config/route";
 import { POST as closeContractRoute } from "../../app/api/my-provider/contracts/close/route";
 import {
   closeAcceptedProviderContract,
+  clearPendingProviderDeployment,
   deployMyProvider,
   getMyProviderOverview,
   importMyProviderPrivateKey,
@@ -106,6 +109,28 @@ describe("my provider routes", () => {
         action: "deploy-provider",
         status: "completed",
         rawOutput: "deployed",
+      },
+      overview: {
+        configured: false,
+        providerAddressRaw: null,
+        providerAddressFriendly: null,
+        onChainBalanceTon: null,
+        onChainBalanceNanoTon: null,
+        lastActivityLabel: null,
+        lastActivityUnix: null,
+        params: null,
+        config: null,
+        contracts: [],
+        pendingDeployment: null,
+        rawInfo: null,
+        setupHint: "Not configured",
+      },
+    });
+    vi.mocked(clearPendingProviderDeployment).mockResolvedValue({
+      result: {
+        action: "clear-pending-deployment",
+        status: "completed",
+        rawOutput: "cleared",
       },
       overview: {
         configured: false,
@@ -251,8 +276,10 @@ describe("my provider routes", () => {
       }),
     });
     await closeContractRoute(closeRequest as never);
+    await clearPendingDeploymentRoute();
 
     expect(deployMyProvider).toHaveBeenCalled();
+    expect(clearPendingProviderDeployment).toHaveBeenCalled();
     expect(initMyProvider).toHaveBeenCalledWith({
       providerAddress: "0:1ADFD61B065544148AA1766AA1C13825BE7C993724A7BBBC9787F0F903921787",
     });

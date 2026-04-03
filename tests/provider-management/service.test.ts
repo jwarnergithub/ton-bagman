@@ -24,6 +24,7 @@ vi.mock("../../src/server/provider-management/deploymentRecord", () => ({
 }));
 
 import {
+  clearPendingProviderDeployment,
   closeAcceptedProviderContract,
   deployMyProvider,
   getMyProviderOverview,
@@ -229,6 +230,27 @@ describe("provider management service", () => {
           "0:1ADFD61B065544148AA1766AA1C13825BE7C993724A7BBBC9787F0F903921787",
       }),
     );
+  });
+
+  it("clears a stuck pending provider deployment record", async () => {
+    const service = createServiceMock();
+    service.getProviderInfo.mockRejectedValue(
+      createAppError("TON_COMMAND_FAILED", "Query error: No storage provider", 502),
+    );
+    vi.mocked(getPendingProviderDeploymentRecord).mockResolvedValue(null);
+
+    vi.mocked(withTonStorageService).mockImplementation(async (callback) =>
+      callback(service as never),
+    );
+
+    const result = await clearPendingProviderDeployment();
+
+    expect(removePendingProviderDeploymentRecord).toHaveBeenCalled();
+    expect(result.result).toMatchObject({
+      action: "clear-pending-deployment",
+      status: "completed",
+    });
+    expect(result.overview.pendingDeployment).toBeNull();
   });
 
   it("treats init as already connected when the daemon is already initialized to the same provider", async () => {

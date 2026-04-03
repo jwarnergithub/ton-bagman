@@ -71,6 +71,7 @@ export type ProviderMutationResult = {
   action:
     | "import-pk"
     | "deploy-provider"
+    | "clear-pending-deployment"
     | "init-provider"
     | "set-provider-params"
     | "set-provider-config"
