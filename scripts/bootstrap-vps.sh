@@ -305,6 +305,14 @@ ensure_llvm() {
   fi
 
   log "Installing LLVM 16 as required by the official TON Ubuntu build guide"
+
+  if apt-cache show clang-16 >/dev/null 2>&1; then
+    log "Using native apt packages for LLVM 16"
+    run_cmd "apt-get install -y clang-16 lld-16 llvm-16 llvm-16-dev"
+    return
+  fi
+
+  log "Native LLVM 16 packages were not available; falling back to apt.llvm.org"
   run_cmd "curl -fsSL https://apt.llvm.org/llvm.sh -o /tmp/llvm.sh"
   run_cmd "chmod +x /tmp/llvm.sh"
   run_cmd "/tmp/llvm.sh 16 all"
