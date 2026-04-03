@@ -74,6 +74,19 @@ describe("parseRuntimeConfig", () => {
     });
   });
 
+  it("treats an empty TonAPI key as unset", () => {
+    const config = parseRuntimeConfig({
+      NODE_ENV: "test",
+      TON_SSH_HOST: "vps.example.com",
+      TON_SSH_USER: "root",
+      TON_SSH_HOST_FINGERPRINT: "SHA256:example",
+      SSH_AUTH_SOCK: "/tmp/agent.sock",
+      TONAPI_API_KEY: "",
+    });
+
+    expect(config.tonApiKey).toBeNull();
+  });
+
   it("parses a valid agent configuration", () => {
     const config = parseRuntimeConfig({
       NODE_ENV: "test",

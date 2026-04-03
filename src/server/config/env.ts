@@ -30,6 +30,14 @@ export type RuntimeConfig = {
 };
 
 const LOCAL_STAGING_ROOT_DIR = ".ton-storage";
+const optionalTrimmedString = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return value;
+  }
+
+  const trimmed = value.trim();
+  return trimmed === "" ? undefined : trimmed;
+}, z.string().min(1).optional());
 
 const envSchema = z
   .object({
@@ -67,7 +75,7 @@ const envSchema = z
       .trim()
       .min(1)
       .default("https://tonapi.io"),
-    TONAPI_API_KEY: z.string().trim().min(1).optional(),
+    TONAPI_API_KEY: optionalTrimmedString,
     TON_REMOTE_BASE_DIR: z
       .string()
       .trim()

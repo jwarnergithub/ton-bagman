@@ -670,6 +670,11 @@ write_app_env() {
     return
   fi
 
+  local tonapi_key_line=""
+  if [[ -n "${TONAPI_API_KEY//[[:space:]]/}" ]]; then
+    tonapi_key_line="TONAPI_API_KEY=$TONAPI_API_KEY"
+  fi
+
   cat > "$APP_ENV_PATH" <<EOF
 NODE_ENV=production
 
@@ -690,7 +695,7 @@ TON_REMOTE_DELETE_ALLOWED_DIRS=$TON_REMOTE_DELETE_ALLOWED_DIRS
 TON_LOCAL_STAGING_DIR=staging
 
 TONAPI_BASE_URL=https://tonapi.io
-TONAPI_API_KEY=$TONAPI_API_KEY
+$tonapi_key_line
 EOF
 
   chown "$APP_USER:$APP_USER" "$APP_ENV_PATH"
